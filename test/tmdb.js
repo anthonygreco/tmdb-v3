@@ -51,6 +51,32 @@ describe('Tmdb', () => {
         });
     });
 
+    describe('#searchPerson()', function() {
+        const tmdb = new Tmdb({ apiKey });
+        const scope = nock('https://api.themoviedb.org/3');
+
+        context('when no query is given', () => {
+            it('throws an error', function() {
+                expect(() => tmdb.searchPerson())
+                    .to.throw('Missing text query');
+            });
+        });
+
+        it('hits the correct endpoint', () => {
+            mockQuery(scope, '/search/person', { query: 'foo' });
+
+            return tmdb.searchPerson('foo')
+                .then(() => expect(scope.isDone()).to.be.true);
+        });
+
+        it('passes options as additional query parameters', () => {
+            mockQuery(scope, '/search/person', { query: 'foo', year: 2016 });
+
+            return tmdb.searchPerson('foo', { year: 2016 })
+                .then(() => expect(scope.isDone()).to.be.true);
+        });
+    });
+
     describe('#discoverMovie()', () => {
         const tmdb = new Tmdb({ apiKey });
         const scope = nock('https://api.themoviedb.org/3');
